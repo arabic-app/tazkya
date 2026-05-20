@@ -157,12 +157,12 @@
         
         <div class="form-group">
             <label>Prénom NOM (en français) :</label>
-            <input type="text" id="fullname_fr" placeholder="Ex: Alp-Aslan-Can POLAT" onblur="updateArabicName()">
+            <input type="text" id="fullname_fr" placeholder="Ex: Kevin LEGRAND" onblur="updateArabicName()">
         </div>
         
         <div class="form-group">
             <label>Prénom NOM (en arabe) - <i>Généré via Google si vide</i> :</label>
-            <input type="text" id="fullname_ar" dir="rtl" placeholder="Ex: ألب أصلان جان بولات" oninput="updateCertificate()">
+            <input type="text" id="fullname_ar" dir="rtl" placeholder="Ex: كيفين لوجراند" oninput="updateCertificate()">
         </div>
         
         <div class="form-group">
@@ -184,7 +184,6 @@
                 </div>
                 <div class="header-center">
                     <p class="title-ar">شهادة تزكية</p>
-                    <p class="subtitle">Masjid Al Houda<br>De Clermont-Ferrand</p>
                 </div>
                 <div class="header-right">
                     <img src="https://raw.githubusercontent.com/arabic-app/conversion/main/logo_al_houda_3.png" alt="Logo" class="logo" id="mosque-logo">
@@ -264,7 +263,7 @@
                         arInput.value = arName;
                         updateCertificate(); 
                     }
-                    arInput.placeholder = "Ex: ألب أصلان جان بولات";
+                    arInput.placeholder = "Ex: كيفين لوجراند";
                 } else {
                     arInput.value = "";
                     updateCertificate();
@@ -293,9 +292,9 @@
 
             // Injection du texte de la Tazkya avec des balises <p> pour contrôler l'espacement
             document.getElementById('ar-content').innerHTML = `
-                <p>أنا الممضي أسفله، عز الدين خامله ، إمام مسجد الهدى بمدينة كلارمون فارون بفرنسا، أشهد أن</p>
+                <p>أنا الممضي أسفله، عز الدين خامله ، إمام مسجد الهدى بمدينة كلارمون فارون بفرنسا، أشهد أن الأخ</p>
                 <div style="text-align: center; font-size: 24px; margin: 15px 0;">
-                    الأخ <span class="bold">${arName}</span> ${frName}
+                     <span class="bold">${arName}</span> ${frName}
                 </div>
                 <p>المولود في <span class="bold">${dob}</span></p>
                 <p>من الشباب المتعلقين بالمساجد الحريصين على صلاة الجماعة، صاحب سلوك حسن، حريص على تعلم العلم النافع في شتى العلوم الشرعية.</p>
