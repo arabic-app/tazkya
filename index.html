@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur - Attestation de Tazkya</title>
+    <style>
+        /* Styles de base pour l'écran */
+        body { 
+            font-family: 'Arial', sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: #525659; /* Couleur de fond style visionneuse PDF */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .bold { font-weight: bold; }
+
+        /* Formulaire (RESPONSIVE) */
+        .form-container {
+            width: 100%; 
+            max-width: 210mm; 
+            background: white; 
+            padding: 20px;
+            border-radius: 8px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #444; }
+        .form-group input { 
+            width: 100%; padding: 10px; box-sizing: border-box; 
+            border: 1px solid #ccc; border-radius: 4px; font-size: 15px;
+        }
+        .btn { 
+            background: #0056b3; color: white; border: none; 
+            padding: 15px; cursor: pointer; border-radius: 4px; 
+            font-size: 16px; width: 100%; font-weight: bold;
+        }
+        .btn:hover { background: #004494; }
+
+        /* Conteneur pour permettre le scroll de la feuille A4 sur smartphone */
+        .preview-wrapper {
+            width: 100%;
+            max-width: 210mm;
+            overflow-x: auto; 
+            padding-bottom: 15px; 
+        }
+
+        /* Conteneur du Certificat - FORMAT A4 EXACT */
+        .page-a4 {
+            width: 210mm;
+            min-width: 210mm; 
+            height: 297mm; 
+            background: white;
+            padding: 20mm; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+            
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* En-tête (Header) */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; 
+            margin-bottom: 40px; 
+        }
+        .header-left { 
+            text-align: left; 
+            font-size: 14px; 
+            line-height: 1.5; 
+            width: 30%;
+        }
+        .header-center { 
+            text-align: center; 
+            width: 40%;
+            margin-top: 20px;
+        }
+        .header-right {
+            text-align: right;
+            width: 30%;
+        }
+        
+        /* LOGO */
+        .logo {
+            max-width: 120px;
+            max-height: 120px;
+            object-fit: contain;
+            margin-top: -20px; 
+        }
+
+        .title-ar { font-size: 32px; font-weight: bold; margin: 0; font-family: 'Times New Roman', serif; }
+        .subtitle { font-size: 16px; margin: 5px 0 0 0; font-style: italic; }
+
+        .bismillah { 
+            text-align: center; font-size: 22px; margin-bottom: 40px; 
+            font-family: 'Times New Roman', serif; direction: rtl;
+        }
+        
+        /* Contenu du texte */
+        .text-ar { 
+            direction: rtl; text-align: justify; font-size: 22px; 
+            font-family: 'Times New Roman', serif; line-height: 1.9; margin-bottom: 30px; 
+        }
+        
+        /* Signatures */
+        .signatures { 
+            display: flex; 
+            justify-content: space-around; 
+            margin-top: 50px; 
+            margin-bottom: 20px; 
+        }
+        .signature-box { text-align: center; }
+        .sig-ar { font-weight: bold; font-family: 'Times New Roman', serif; font-size: 22px; margin-bottom: 5px;}
+        .sig-fr { font-weight: bold; font-size: 16px;}
+        
+        /* Pied de page */
+        .footer { 
+            margin-top: auto; 
+            text-align: center; 
+            font-size: 11px; 
+            border-top: 1px solid #000; 
+            padding-top: 10px;
+        }
+
+        /* Mode Impression (Génération PDF) */
+        @media print {
+            body, html { background: white; padding: 0; margin: 0; display: block; }
+            .form-container { display: none !important; }
+            .preview-wrapper { 
+                overflow: visible; 
+                margin: 0;
+                padding: 0;
+            }
+            .page-a4 { 
+                box-shadow: none; 
+                margin: 0;
+                width: 210mm; 
+                height: 297mm; 
+            }
+            @page { size: A4; margin: 0; } 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <center><h2 style="color: #333;">Attestation de Tazkya</h2></center>
+        
+        <div class="form-group">
+            <label>Prénom NOM (en français) :</label>
+            <input type="text" id="fullname_fr" placeholder="Ex: Alp-Aslan-Can POLAT" onblur="updateArabicName()">
+        </div>
+        
+        <div class="form-group">
+            <label>Prénom NOM (en arabe) - <i>Généré via Google si vide</i> :</label>
+            <input type="text" id="fullname_ar" dir="rtl" placeholder="Ex: ألب أصلان جان بولات" oninput="updateCertificate()">
+        </div>
+        
+        <div class="form-group">
+            <label>Date de naissance :</label>
+            <input type="date" id="dob" onchange="updateCertificate()">
+        </div>
+
+        <button class="btn" onclick="window.print()">🖨️ Générer le PDF (Imprimer)</button>
+    </div>
+
+    <div class="preview-wrapper">
+        <div class="page-a4">
+            <div class="header">
+                <div class="header-left">
+                    <span class="bold">Mosquée Al Houda</span><br>
+                    9 Rue Edith Piaf<br>
+                    Clermont-Ferrand 63100<br>
+                    France
+                </div>
+                <div class="header-center">
+                    <p class="title-ar">شهادة تزكية</p>
+                    <p class="subtitle">Masjid Al Houda<br>De Clermont-Ferrand</p>
+                </div>
+                <div class="header-right">
+                    <img src="https://raw.githubusercontent.com/arabic-app/conversion/main/logo_al_houda_3.png" alt="Logo" class="logo" id="mosque-logo">
+                </div>
+            </div>
+
+            <div class="bismillah">
+                بسم الله الرحمن الرحيم وصلى الله وسلم على محمد وعلى آله وصحبه وبعد،
+            </div>
+
+            <div id="ar-content" class="text-ar"></div>
+
+            <div class="signatures">
+                <div class="signature-box">
+                    <div class="sig-ar">رئيس الجمعية</div>
+                    <div class="sig-fr">Président de l'association</div>
+                </div>
+                <div class="signature-box">
+                    <div class="sig-ar">إمام المسجد</div>
+                    <div class="sig-fr">Imam de la mosquée</div>
+                </div>
+            </div>
+
+            <div class="footer">
+                Déclaration au Journal Officiel de la préfecture du Puy-de-Dôme FRANCE, ASSOCIATION DES JEUNES D'AUVERGNE POUR LE BIEN. Annonce n° 547 63
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gestion de la modification manuelle de l'arabe
+        let arabicManuallyEdited = false;
+        const arInput = document.getElementById('fullname_ar');
+        const frInput = document.getElementById('fullname_fr');
+
+        arInput.addEventListener('input', () => {
+            arabicManuallyEdited = arInput.value.trim() !== "";
+        });
+
+        // Translittération via l'API Google
+        async function fetchGoogleTransliteration(text) {
+            if (!text) return "";
+            const words = text.split(' ');
+            let arabicWords = [];
+
+            try {
+                for (let word of words) {
+                    if (word.trim() === "") continue;
+                    const url = `https://inputtools.google.com/request?text=${encodeURIComponent(word)}&itc=ar-t-i0-und&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8&app=demopage`;
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    if (data[0] === 'SUCCESS' && data[1] && data[1][0] && data[1][0][1]) {
+                        arabicWords.push(data[1][0][1][0]);
+                    } else {
+                        arabicWords.push(word);
+                    }
+                }
+                return arabicWords.join(' ');
+            } catch (error) {
+                console.error("Erreur API:", error);
+                return text;
+            }
+        }
+
+        // Action quand on quitte le champ FR
+        async function updateArabicName() {
+            updateCertificate(); 
+            
+            if (!arabicManuallyEdited) {
+                const frName = frInput.value.trim();
+                if (frName) {
+                    arInput.placeholder = "Génération en cours...";
+                    const arName = await fetchGoogleTransliteration(frName);
+                    
+                    if (!arabicManuallyEdited) {
+                        arInput.value = arName;
+                        updateCertificate(); 
+                    }
+                    arInput.placeholder = "Ex: ألب أصلان جان بولات";
+                } else {
+                    arInput.value = "";
+                    updateCertificate();
+                }
+            }
+        }
+
+        // Met à jour la page A4
+        function updateCertificate() {
+            const frName = document.getElementById('fullname_fr').value || '[NOM Français]';
+            const arName = document.getElementById('fullname_ar').value || '[الاسم بالعربية]';
+            
+            // Format de la date (JJ / MM / AAAA)
+            const formatDate = (dateStr) => {
+                if(!dateStr) return '[JJ / MM / AAAA]';
+                const parts = dateStr.split('-');
+                if(parts.length !== 3) return '[JJ / MM / AAAA]';
+                return `${parts[2]} / ${parts[1]} / ${parts[0]}`;
+            };
+
+            const dob = formatDate(document.getElementById('dob').value);
+            
+            // Date du jour automatique
+            const todayObj = new Date();
+            const today = `${String(todayObj.getDate()).padStart(2, '0')} / ${String(todayObj.getMonth() + 1).padStart(2, '0')} / ${todayObj.getFullYear()}`;
+
+            // Injection du texte de la Tazkya
+            document.getElementById('ar-content').innerHTML = `
+                أنا الممضي أسفله، عز الدين خامله ، إمام مسجد الهدى بمدينة كلارمون فارون بفرنسا، أشهد أن<br><br>
+                <div style="text-align: center; font-size: 26px;">
+                    الأخ <span class="bold">${arName}</span> ${frName}
+                </div><br>
+                المولود في <span class="bold">${dob}</span><br><br>
+                من الشباب المتعلقين بالمساجد الحريصين على صلاة الجماعة، صاحب سلوك حسن، حريص على تعلم العلم النافع في شتى العلوم الشرعية.<br><br>
+                نلتمس منكم قبوله في جامعتكم حتى يتسنى له التدرج في العلوم الشرعية على أسس صحيحة ليتمكن من نفع نفسه ابتداء ثم نشر ما تعلمه في بلده الأصلي متى أتم تعلمه في جامعتكم المباركة.<br><br>
+                وقد منحت له هذه الشهادة للإدلاء بها عند الحاجة.<br><br>
+                حرر في كلارمون فارون بتاريخ <span class="bold">${today}</span>
+            `;
+        }
+
+        // Lancement au chargement de la page
+        window.onload = updateCertificate;
+    </script>
+</body>
+</html>
