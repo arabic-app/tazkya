@@ -78,7 +78,8 @@
         /* Champs de saisie Material */
         .form-group input { 
             width: 100%; 
-            padding: 12px 16px; 
+            height: 46px; /* Hauteur fixe stricte pour les inputs */
+            padding: 0 16px; 
             box-sizing: border-box; 
             border: 1px solid var(--border-color); 
             border-radius: 4px;
@@ -128,14 +129,15 @@
             margin-top: 10px;
         }
         
-        /* Bouton Icône unique pour la translittération */
+        /* Bouton Icône unique pour la translittération ajusté au pixel près */
         .btn-icon {
             background: transparent;
             color: var(--primary-color);
             border: 1px solid var(--border-color);
-            width: 48px;
-            height: 48px;
-            min-width: 48px;
+            width: 46px;  /* Strictement identique à la hauteur de l'input */
+            height: 46px; /* Strictement identique à la hauteur de l'input */
+            min-width: 46px;
+            padding: 0;   /* Nettoie les paddings par défaut des navigateurs */
             cursor: pointer;
             border-radius: 4px;
             display: flex;
@@ -365,7 +367,6 @@
             }
         }
 
-        // Fonction déclenchée au clic sur l'icône de traduction
         async function generateArabicName() {
             const frName = frInput.value.trim();
             if (frName) {
@@ -400,7 +401,7 @@
                 </div>
                 <p>المولود في <span class="bold">${dob}</span></p>
                 <p>من الشباب المتعلقين بالمساجد الحريصين على صلاة الجماعة، صاحب سلوك حسن، حريص على تعلم العلم النافع في شتى العلوم الشرعية.</p>
-                <p>نلتمس منكم قبوله في جامعتكم حتى يتسنى له التدرج في العلوم الشرعية على أسس صحيحة ليتمكن من نفع نفسه ابتداء ثم نشر ما تعلمه in بلده الأصلي متى أتم تعلمه في جامعتكم المباركة.</p>
+                <p>نلتمس منكم قبوله في جامعتكم حتى يتسنى له التدرج في العلوم الشرعية على أسس صحيحة ليتمكن من نفع نفسه ابتداء ثم نشر ما تعلمه في بلده الأصلي متى أتم تعلمه في جامعتكم المباركة.</p>
                 <p>وقد منحت له هذه الشهادة للإدلاء بها عند الحاجة.</p>
                 <p>حرر في كلارمون فارون بتاريخ <span class="bold">${today}</span></p>
             `;
