@@ -64,6 +64,16 @@
             color: var(--text-secondary); 
             font-size: 14px;
         }
+
+        /* Alignement du champ arabe avec son bouton icône */
+        .input-with-action {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .input-with-action input {
+            flex-grow: 1;
+        }
         
         /* Champs de saisie Material */
         .form-group input { 
@@ -87,13 +97,15 @@
         }
         
         .form-group i.hint {
+            display: block;
+            margin-top: 5px;
             font-style: italic;
             font-size: 12px;
             color: var(--text-secondary);
             font-weight: 400;
         }
 
-        /* Bouton Material */
+        /* Bouton Principal Material */
         .btn { 
             background: var(--primary-color); 
             color: white; 
@@ -111,10 +123,33 @@
             font-family: 'Roboto', sans-serif;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            /* Ombre du bouton */
             box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);
             transition: background-color 0.2s, box-shadow 0.2s;
             margin-top: 10px;
+        }
+        
+        /* Bouton Icône unique pour la translittération */
+        .btn-icon {
+            background: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, border-color 0.2s;
+            box-sizing: border-box;
+        }
+        .btn-icon:hover {
+            background-color: rgba(26, 115, 232, 0.04);
+            border-color: var(--primary-color);
+        }
+        .btn-icon:active {
+            background-color: rgba(26, 115, 232, 0.1);
         }
         
         .btn:hover { 
@@ -236,12 +271,18 @@
         
         <div class="form-group">
             <label for="fullname_fr">Prénom NOM (en français)</label>
-            <input type="text" id="fullname_fr" placeholder="Ex: Kevin LEGRAND" onblur="updateArabicName()">
+            <input type="text" id="fullname_fr" placeholder="Ex: Kevin LEGRAND" oninput="updateCertificate()">
         </div>
         
         <div class="form-group">
-            <label for="fullname_ar">Prénom NOM (en arabe) <i class="hint">Généré via Google si vide</i></label>
-            <input type="text" id="fullname_ar" dir="rtl" placeholder="Ex: كيفين لوجراند" oninput="updateCertificate()">
+            <label for="fullname_ar">Prénom NOM (en arabe)</label>
+            <div class="input-with-action">
+                <input type="text" id="fullname_ar" dir="rtl" placeholder="Ex: كيفين لوجراند" oninput="updateCertificate()">
+                <button type="button" class="btn-icon" onclick="generateArabicName()">
+                    <span class="material-icons">translate</span>
+                </button>
+            </div>
+            <i class="hint">Cliquez sur l'icône pour générer le nom automatiquement via Google</i>
         </div>
         
         <div class="form-group">
@@ -296,13 +337,8 @@
     </div>
 
     <script>
-        let arabicManuallyEdited = false;
         const arInput = document.getElementById('fullname_ar');
         const frInput = document.getElementById('fullname_fr');
-
-        arInput.addEventListener('input', () => {
-            arabicManuallyEdited = arInput.value.trim() !== "";
-        });
 
         async function fetchGoogleTransliteration(text) {
             if (!text) return "";
@@ -329,24 +365,15 @@
             }
         }
 
-        async function updateArabicName() {
-            updateCertificate(); 
-            
-            if (!arabicManuallyEdited) {
-                const frName = frInput.value.trim();
-                if (frName) {
-                    arInput.placeholder = "Génération en cours...";
-                    const arName = await fetchGoogleTransliteration(frName);
-                    
-                    if (!arabicManuallyEdited) {
-                        arInput.value = arName;
-                        updateCertificate(); 
-                    }
-                    arInput.placeholder = "Ex: كيفين لوجراند";
-                } else {
-                    arInput.value = "";
-                    updateCertificate();
-                }
+        // Fonction déclenchée au clic sur l'icône de traduction
+        async function generateArabicName() {
+            const frName = frInput.value.trim();
+            if (frName) {
+                arInput.placeholder = "Génération en cours...";
+                const arName = await fetchGoogleTransliteration(frName);
+                arInput.value = arName;
+                arInput.placeholder = "Ex: كيفين لوجراند";
+                updateCertificate(); 
             }
         }
 
@@ -373,7 +400,7 @@
                 </div>
                 <p>المولود في <span class="bold">${dob}</span></p>
                 <p>من الشباب المتعلقين بالمساجد الحريصين على صلاة الجماعة، صاحب سلوك حسن، حريص على تعلم العلم النافع في شتى العلوم الشرعية.</p>
-                <p>نلتمس منكم قبوله في جامعتكم حتى يتسنى له التدرج في العلوم الشرعية على أسس صحيحة ليتمكن من نفع نفسه ابتداء ثم نشر ما تعلمه في بلده الأصلي متى أتم تعلمه في جامعتكم المباركة.</p>
+                <p>نلتمس منكم قبوله في جامعتكم حتى يتسنى له التدرج في العلوم الشرعية على أسس صحيحة ليتمكن من نفع نفسه ابتداء ثم نشر ما تعلمه in بلده الأصلي متى أتم تعلمه في جامعتكم المباركة.</p>
                 <p>وقد منحت له هذه الشهادة للإدلاء بها عند الحاجة.</p>
                 <p>حرر في كلارمون فارون بتاريخ <span class="bold">${today}</span></p>
             `;
